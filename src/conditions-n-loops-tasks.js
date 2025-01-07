@@ -368,34 +368,17 @@ function getSpiralMatrix(size) {
  *    [7, 8, 9]         [9, 6, 3]
  *  ]                 ]
  */
-function rotateMatrix() {
-  throw new Error('Not implemented');
-  // const size = matrix.length;
+function rotateMatrix(matrix) {
+  const matrixCopy = JSON.parse(JSON.stringify(matrix));
+  const rotatedMatrix = matrix;
 
-  // // Проверка на квадратность матрицы
-  // if (matrix.some((row) => row.length !== size)) {
-  //   throw new Error('Matrix must be square');
-  // }
+  for (let i = 0; i < matrix.length; i += 1) {
+    for (let j = matrix.length - 1, k = 0; j >= 0; j -= 1, k += 1) {
+      rotatedMatrix[i][k] = matrixCopy[j][i];
+    }
+  }
 
-  // // Создание новой матрицы для результата
-  // const result = matrix.map((row) => [...row]);
-
-  // for (let layer = 0; layer < Math.floor(size / 2); layer += 1) {
-  //   const first = layer;
-  //   const last = size - layer - 1;
-
-  //   for (let i = first; i < last; i += 1) {
-  //     const offset = i - first;
-  //     const top = result[first][i];
-
-  //     result[first][i] = result[last - offset][first];
-  //     result[last - offset][first] = result[last][last - offset];
-  //     result[last][last - offset] = result[i][last];
-  //     result[i][last] = top;
-  //   }
-  // }
-
-  // return result;
+  return rotatedMatrix;
 }
 
 /**
@@ -412,22 +395,62 @@ function rotateMatrix() {
  *  [2, 9, 5, 9]    => [2, 5, 9, 9]
  *  [-2, 9, 5, -3]  => [-3, -2, 5, 9]
  */
-function sortByAsc() {
-  throw new Error('Not implemented');
-  // const arrCopy = [...arr]; // Создаем копию массива
+function sortByAsc(arr) {
+  const merge = (arr1, arr2) => {
+    let i = 0;
+    let j = 0;
 
-  // const n = arrCopy.length;
-  // for (let i = 0; i < n - 1; i += 1) {
-  //   for (let j = i + 1; j < n; j += 1) {
-  //     if (arrCopy[i] > arrCopy[j]) {
-  //       const temp = arrCopy[i];
-  //       arrCopy[i] = arrCopy[j];
-  //       arrCopy[j] = temp;
-  //     }
-  //   }
-  // }
+    const results = [];
 
-  // return arrCopy;
+    while (i < arr1.length && j < arr2.length) {
+      if (arr2[j] > arr1[i]) {
+        results[results.length] = arr1[i];
+        i += 1;
+      } else {
+        results[results.length] = arr2[j];
+        j += 1;
+      }
+    }
+
+    while (i < arr1.length) {
+      results[results.length] = arr1[i];
+      i += 1;
+    }
+
+    while (j < arr2.length) {
+      results[results.length] = arr2[j];
+      j += 1;
+    }
+
+    return results;
+  };
+
+  if (arr.length <= 1) return arr;
+
+  const mergeSort = (mergedArr) => {
+    if (mergedArr.length <= 1) return mergedArr;
+
+    const mid = Math.floor(mergedArr.length / 2);
+    const left = [];
+    const right = [];
+
+    for (let i = 0, j = 0; i < mergedArr.length; i += 1) {
+      if (i < mid) left[i] = mergedArr[i];
+      else {
+        right[j] = mergedArr[i];
+        j += 1;
+      }
+    }
+
+    return merge(mergeSort(left), mergeSort(right));
+  };
+
+  const sortedArr = mergeSort(arr);
+  const initialArr = arr;
+
+  for (let i = 0; i < sortedArr.length; i += 1) initialArr[i] = sortedArr[i];
+
+  return sortedArr;
 }
 
 /**
@@ -448,24 +471,38 @@ function sortByAsc() {
  *  'qwerty', 3 => 'qetwry' => 'qtrewy' => 'qrwtey'
  */
 function shuffleChar(str, iterations) {
-  let strCopy = str;
+  const hash = {};
 
-  for (let i = 0; i < iterations; i += 1) {
-    let evenChars = '';
-    let oddChars = '';
+  let result = '';
+  let repeatIteration;
 
-    for (let j = 0; j < strCopy.length; j += 1) {
-      if (j % 2 === 0) {
-        evenChars += strCopy[j];
-      } else {
-        oddChars += strCopy[j];
-      }
+  const shuffleOdd = (initialStr) => {
+    let newStr = '';
+
+    for (let i = 0; i < initialStr.length; i += 1) {
+      if (!(i % 2)) newStr += initialStr[i];
     }
 
-    strCopy = evenChars + oddChars;
+    for (let i = 0; i < initialStr.length; i += 1) {
+      if (i % 2) newStr += initialStr[i];
+    }
+
+    return newStr;
+  };
+
+  for (let i = 0; i < iterations; i += 1) {
+    if (result === str) {
+      repeatIteration = i;
+      break;
+    }
+
+    result = shuffleOdd(result || str);
+    hash[i] = result;
   }
 
-  return strCopy;
+  return !repeatIteration
+    ? result
+    : hash[(iterations % repeatIteration || repeatIteration) - 1];
 }
 
 /**
